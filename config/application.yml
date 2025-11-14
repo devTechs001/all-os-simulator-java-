@@ -1,0 +1,184 @@
+# Main application configuration
+spring:
+  application:
+    name: all-os-simulator
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:development}
+  
+  # Database configuration
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/ossimulator
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  # MongoDB for AI models
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_HOST:localhost}:${MONGO_PORT:27017}/ai_models
+      database: ai_models
+  
+  # Redis cache
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+  
+  # WebSocket configuration
+  websocket:
+    message-broker:
+      relay-host: ${BROKER_HOST:localhost}
+      relay-port: ${BROKER_PORT:61613}
+      client-login: ${BROKER_USER:guest}
+      client-passcode: ${BROKER_PASSWORD:guest}
+
+# Server configuration
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+  http2:
+    enabled: true
+
+# AI/ML Configuration
+ai:
+  models:
+    path: ${AI_MODEL_PATH:/models}
+    cache-size: ${AI_MODEL_CACHE_SIZE:5}
+  tensorflow:
+    threads: ${TF_THREADS:4}
+    use-gpu: ${TF_USE_GPU:true}
+    gpu-memory-fraction: ${TF_GPU_MEMORY:0.7}
+  inference:
+    batch-size: ${INFERENCE_BATCH_SIZE:32}
+    timeout: ${INFERENCE_TIMEOUT:5000}
+  training:
+    enabled: ${AI_TRAINING_ENABLED:false}
+    schedule: "0 0 2 * * *" # 2 AM daily
+
+# OS Simulation Configuration
+os-simulation:
+  default-os: ${DEFAULT_OS:linux}
+  available-os:
+    - windows
+    - linux
+    - macos
+    - android
+    - ios
+    - freebsd
+    - chromeos
+  
+  kernel:
+    tick-rate: ${KERNEL_TICK_RATE:100} # Hz
+    scheduler-algorithm: ${SCHEDULER_ALGORITHM:CFS}
+    max-processes: ${MAX_PROCESSES:1024}
+    max-threads-per-process: ${MAX_THREADS:256}
+  
+  memory:
+    total-size: ${MEMORY_SIZE:4294967296} # 4GB
+    page-size: ${PAGE_SIZE:4096}
+    swap-size: ${SWAP_SIZE:8589934592} # 8GB
+    cache-size: ${CACHE_SIZE:1073741824} # 1GB
+  
+  filesystem:
+    type: ${FS_TYPE:ext4}
+    root-size: ${ROOT_SIZE:107374182400} # 100GB
+    enable-compression: ${FS_COMPRESSION:true}
+    enable-encryption: ${FS_ENCRYPTION:true}
+  
+  network:
+    interfaces:
+      - name: eth0
+        type: ethernet
+        speed: 1000 # Mbps
+      - name: wlan0
+        type: wifi
+        speed: 867 # Mbps
+    enable-firewall: true
+    enable-nat: true
+
+# Security Configuration
+security:
+  encryption:
+    algorithm: ${ENCRYPTION_ALGORITHM:AES}
+    key-size: ${ENCRYPTION_KEY_SIZE:256}
+  
+  authentication:
+    methods:
+      - password
+      - biometric
+      - two-factor
+    session-timeout: ${SESSION_TIMEOUT:1800} # 30 minutes
+  
+  sandbox:
+    enabled: ${SANDBOX_ENABLED:true}
+    isolation-level: ${SANDBOX_LEVEL:strict}
+  
+  audit:
+    enabled: ${AUDIT_ENABLED:true}
+    log-level: ${AUDIT_LEVEL:INFO}
+    retention-days: ${AUDIT_RETENTION:90}
+
+# Performance Configuration
+performance:
+  monitoring:
+    enabled: ${MONITORING_ENABLED:true}
+    metrics-interval: ${METRICS_INTERVAL:1000} # ms
+    profiling-enabled: ${PROFILING_ENABLED:false}
+  
+  optimization:
+    ai-optimization: ${AI_OPTIMIZATION:true}
+    adaptive-scheduling: ${ADAPTIVE_SCHEDULING:true}
+    predictive-caching: ${PREDICTIVE_CACHING:true}
+  
+  limits:
+    max-cpu-usage: ${MAX_CPU:90} # percent
+    max-memory-usage: ${MAX_MEMORY:85} # percent
+    max-disk-io: ${MAX_DISK_IO:100} # MB/s
+
+# Logging Configuration
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.allossimulator: ${APP_LOG_LEVEL:DEBUG}
+    com.allossimulator.ai: ${AI_LOG_LEVEL:INFO}
+    org.springframework: ${SPRING_LOG_LEVEL:INFO}
+    org.tensorflow: ${TF_LOG_LEVEL:WARN}
+  
+  file:
+    name: ${LOG_FILE:logs/application.log}
+    max-size: ${LOG_MAX_SIZE:100MB}
+    max-history: ${LOG_MAX_HISTORY:30}
+  
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,loggers
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  health:
+    defaults:
+      enabled: true
+    diskspace:
+      threshold: ${DISK_THRESHOLD:10737418240} # 10GB

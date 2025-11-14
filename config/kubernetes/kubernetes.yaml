@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: os-simulator
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: os-simulator-config
+  namespace: os-simulator
+data:
+  application.yml: |
+    server:
+      port: 8080
+    ai:
+      model-path: /models
+      inference-threads: 4
+    database:
+      url: jdbc:postgresql://postgres:5432/ossimulator
+    cache:
+      type: redis
+      host: redis
+      port: 6379
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: os-simulator
+  namespace: os-simulator
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: os-simulator
+  template:
+    metadata:
+      labels:
+        app: os-simulator
+    spec:
+      containers:
+      - name: os-simulator
+        image: os-simulator:2.0.0
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: 1  # Request 1 GPU
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+        - name: models
+          mountPath: /models
+        - name: data
+          mountPath: /data
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "production,kubernetes"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: os-simulator-config
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-pvc
+      - name: data
+        persistentVolumeClaim:
+          claimName: data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: os-simulator-service
+  namespace: os-simulator
+spec:
+  selector:
+    app: os-simulator
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+  - port: 8081
+    targetPort: 8081
+    name: websocket
+  type: LoadBalancer
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: os-simulator-hpa
+  namespace: os-simulator
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: os-simulator
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

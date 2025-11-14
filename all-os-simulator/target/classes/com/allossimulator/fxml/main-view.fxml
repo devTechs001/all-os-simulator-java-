@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/19" 
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.allossimulator.controller.MainController"
+            prefHeight="900" prefWidth="1400">
+    
+    <!-- Top: Menu and Toolbar -->
+    <top>
+        <VBox>
+            <MenuBar fx:id="menuBar">
+                <menus>
+                    <Menu text="File">
+                        <items>
+                            <MenuItem text="New OS Instance" onAction="#handleNewOS" accelerator="Ctrl+N"/>
+                            <MenuItem text="Open OS" onAction="#handleOpenOS" accelerator="Ctrl+O"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem text="Save State" onAction="#handleSaveState" accelerator="Ctrl+S"/>
+                            <MenuItem text="Load State" onAction="#handleLoadState"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem text="Exit" onAction="#handleExit" accelerator="Alt+F4"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Edit">
+                        <items>
+                            <MenuItem text="Preferences" onAction="#handlePreferences"/>
+                            <MenuItem text="System Settings" onAction="#handleSystemSettings"/>
+                        </items>
+                    </Menu>
+                    <Menu text="View">
+                        <items>
+                            <CheckMenuItem fx:id="sidebarToggle" text="Sidebar" selected="true"/>
+                            <CheckMenuItem fx:id="statusBarToggle" text="Status Bar" selected="true"/>
+                            <SeparatorMenuItem/>
+                            <RadioMenuItem text="Light Theme" toggleGroup="$themeGroup"/>
+                            <RadioMenuItem text="Dark Theme" toggleGroup="$themeGroup" selected="true"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Tools">
+                        <items>
+                            <MenuItem text="Process Manager" onAction="#handleProcessManager"/>
+                            <MenuItem text="Resource Monitor" onAction="#handleResourceMonitor"/>
+                            <MenuItem text="Terminal" onAction="#handleTerminal"/>
+                            <MenuItem text="Network Tools" onAction="#handleNetworkTools"/>
+                            <MenuItem text="Disk Manager" onAction="#handleDiskManager"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Help">
+                        <items>
+                            <MenuItem text="Documentation" onAction="#handleDocumentation"/>
+                            <MenuItem text="About" onAction="#handleAbout"/>
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
+            
+            <ToolBar fx:id="toolBar">
+                <items>
+                    <Label text="OS:"/>
+                    <ComboBox fx:id="osSelector" prefWidth="150">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Windows 11"/>
+                                <String fx:value="Ubuntu 22.04"/>
+                                <String fx:value="macOS Monterey"/>
+                                <String fx:value="Android 13"/>
+                                <String fx:value="iOS 16"/>
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                    <Separator/>
+                    <Button text="Boot" onAction="#handleBoot" styleClass="boot-button"/>
+                    <Button text="Shutdown" onAction="#handleShutdown" styleClass="shutdown-button"/>
+                    <Button text="Restart" onAction="#handleRestart"/>
+                    <Button text="Suspend" onAction="#handleSuspend"/>
+                    <Separator/>
+                    <Button text="Terminal" onAction="#handleTerminal">
+                        <graphic>
+                            <ImageView fitHeight="16" fitWidth="16">
+                                <image>
+                                    <Image url="@/images/icons/terminal.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button text="Files" onAction="#handleFileManager">
+                        <graphic>
+                            <ImageView fitHeight="16" fitWidth="16">
+                                <image>
+                                    <Image url="@/images/icons/folder.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button text="Monitor" onAction="#handleResourceMonitor">
+                        <graphic>
+                            <ImageView fitHeight="16" fitWidth="16">
+                                <image>
+                                    <Image url="@/images/icons/monitor.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </items>
+            </ToolBar>
+        </VBox>
+    </top>
+    
+    <!-- Left: Sidebar -->
+    <left>
+        <VBox fx:id="sidebar" prefWidth="250" styleClass="sidebar" spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <children>
+                <TextField fx:id="searchField" promptText="Search..." styleClass="search-field"/>
+                
+                <TreeView fx:id="navigationTree" prefHeight="400" VBox.vgrow="ALWAYS">
+                    <root>
+                        <TreeItem value="System" expanded="true">
+                            <children>
+                                <TreeItem value="Operating System" expanded="true">
+                                    <children>
+                                        <TreeItem value="Boot Manager"/>
+                                        <TreeItem value="Kernel"/>
+                                        <TreeItem value="Services"/>
+                                        <TreeItem value="Drivers"/>
+                                    </children>
+                                </TreeItem>
+                                <TreeItem value="Processes">
+                                    <children>
+                                        <TreeItem value="Running"/>
+                                        <TreeItem value="Suspended"/>
+                                        <TreeItem value="Terminated"/>
+                                    </children>
+                                </TreeItem>
+                                <TreeItem value="Memory">
+                                    <children>
+                                        <TreeItem value="Physical Memory"/>
+                                        <TreeItem value="Virtual Memory"/>
+                                        <TreeItem value="Cache"/>
+                                        <TreeItem value="Swap"/>
+                                    </children>
+                                </TreeItem>
+                                <TreeItem value="Storage">
+                                    <children>
+                                        <TreeItem value="Disks"/>
+                                        <TreeItem value="Partitions"/>
+                                        <TreeItem value="File Systems"/>
+                                        <TreeItem value="Mount Points"/>
+                                    </children>
+                                </TreeItem>
+                                <TreeItem value="Network">
+                                    <children>
+                                        <TreeItem value="Interfaces"/>
+                                        <TreeItem value="Connections"/>
+                                        <TreeItem value="Firewall"/>
+                                        <TreeItem value="DNS"/>
+                                    </children>
+                                </TreeItem>
+                            </children>
+                        </TreeItem>
+                    </root>
+                </TreeView>
+                
+                <Separator/>
+                
+                <VBox spacing="5">
+                    <Label text="Quick Actions" styleClass="section-header"/>
+                    <Button text="New Process" prefWidth="Infinity" onAction="#handleNewProcess"/>
+                    <Button text="Kill Process" prefWidth="Infinity" onAction="#handleKillProcess"/>
+                    <Button text="Clear Memory" prefWidth="Infinity" onAction="#handleClearMemory"/>
+                    <Button text="Network Reset" prefWidth="Infinity" onAction="#handleNetworkReset"/>
+                </VBox>
+            </children>
+        </VBox>
+    </left>
+    
+    <!-- Center: Main Content -->
+    <center>
+        <TabPane fx:id="mainTabPane" tabClosingPolicy="ALL_TABS">
+            <tabs>
+                <Tab text="Dashboard" closable="false">
+                    <content>
+                        <fx:include source="os-dashboard.fxml"/>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    
+    <!-- Bottom: Status Bar -->
+    <bottom>
+        <HBox fx:id="statusBar" styleClass="status-bar" spacing="10" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="5" right="10" bottom="5" left="10"/>
+            </padding>
+            <children>
+                <Label fx:id="osStatusLabel" text="OS: Not Loaded"/>
+                <Separator orientation="VERTICAL"/>
+                <Label text="CPU:"/>
+                <ProgressBar fx:id="cpuProgressBar" prefWidth="100" progress="0"/>
+                <Label fx:id="cpuLabel" text="0%"/>
+                <Separator orientation="VERTICAL"/>
+                <Label text="RAM:"/>
+                <ProgressBar fx:id="memProgressBar" prefWidth="100" progress="0"/>
+                <Label fx:id="memLabel" text="0%"/>
+                <Separator orientation="VERTICAL"/>
+                <Label fx:id="netStatusLabel" text="Network: Connected"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="timeLabel" text="00:00:00"/>
+            </children>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

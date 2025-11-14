@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.allossimulator.controller.ProcessManagerController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <children>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <children>
+                <Label text="Filter:"/>
+                <TextField fx:id="filterField" prefWidth="200" promptText="Enter process name or PID..."/>
+                <Button text="Refresh" onAction="#handleRefresh"/>
+                <Button text="End Process" onAction="#handleEndProcess"/>
+                <Button text="Properties" onAction="#handleProcessProperties"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Sort By:" onAction="#handleSortMenu">
+                    <graphic>
+                        <Label text="CPU" fx:id="sortByLabel"/>
+                    </graphic>
+                </Button>
+            </children>
+        </HBox>
+        
+        <Separator/>
+        
+        <TableView fx:id="processTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn text="PID" prefWidth="80.0" fx:id="pidColumn"/>
+                <TableColumn text="Name" prefWidth="200.0" fx:id="nameColumn"/>
+                <TableColumn text="CPU %" prefWidth="80.0" fx:id="cpuColumn"/>
+                <TableColumn text="Memory" prefWidth="100.0" fx:id="memoryColumn"/>
+                <TableColumn text="Priority" prefWidth="80.0" fx:id="priorityColumn"/>
+                <TableColumn text="Status" prefWidth="100.0" fx:id="statusColumn"/>
+                <TableColumn text="Threads" prefWidth="80.0" fx:id="threadsColumn"/>
+                <TableColumn text="User" prefWidth="100.0" fx:id="userColumn"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TableView>
+        
+        <Separator/>
+        
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <children>
+                <VBox spacing="5">
+                    <children>
+                        <Label text="Total Processes:"/>
+                        <Label fx:id="totalProcessesLabel" text="0"/>
+                    </children>
+                </VBox>
+                <VBox spacing="5">
+                    <children>
+                        <Label text="Running:"/>
+                        <Label fx:id="runningProcessesLabel" text="0"/>
+                    </children>
+                </VBox>
+                <VBox spacing="5">
+                    <children>
+                        <Label text="Sleeping:"/>
+                        <Label fx:id="sleepingProcessesLabel" text="0"/>
+                    </children>
+                </VBox>
+                <VBox spacing="5">
+                    <children>
+                        <Label text="Memory Usage:"/>
+                        <ProgressBar fx:id="processMemoryUsage" progress="0.0" prefWidth="150"/>
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="New Process" onAction="#handleNewProcess"/>
+            </children>
+        </HBox>
+    </children>
+</VBox>
